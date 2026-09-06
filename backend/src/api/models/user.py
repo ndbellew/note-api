@@ -7,10 +7,10 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from api.extensions import db
 
 
-class User(db.Model):
+class User(db.Model):  # type: ignore[name-defined]
     __tablename__ = "users"
-
     id: Mapped[int] = mapped_column(primary_key=True)
+
     email: Mapped[str] = mapped_column(
         String(320),
         unique=True,
@@ -29,6 +29,10 @@ class User(db.Model):
     created_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(UTC),
         nullable=False,
+    )
+
+    notes = db.relationship(
+        "Note", backref="user", lazy=True, cascade="all, delete-orphan"
     )
 
     def set_password(self, password: str) -> None:

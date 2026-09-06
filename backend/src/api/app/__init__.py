@@ -1,7 +1,10 @@
 from flask import Flask
 
+from api import models  # noqa: F401
+from api.app.routes import api_bp
 from api.config import Config
 from api.extensions import cors, csrf, db, jwt, migrate
+from api.notes.routes import notes_bp
 
 
 def create_app(config_class=Config) -> Flask:
@@ -22,9 +25,7 @@ def create_app(config_class=Config) -> Flask:
         },
     )
 
-    from api import models  # noqa: F401
-    from api.app.routes import api_bp
-
     app.register_blueprint(api_bp)
+    app.register_blueprint(notes_bp)
 
     return app

@@ -36,8 +36,18 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
+      - name: Scan dependencies
+        run: uv run pip-audit --skip-editable
+
       - name: Lint
         run: uv run ruff check .
+
+      - name: Type Checker
+        run: uv run mypy src
+        continue-on-error: true
+
+      - name: SAST
+        run: uv run bandit -r src
 
       - name: Check formatting
         run: uv run ruff format --check .
