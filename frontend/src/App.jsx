@@ -11,6 +11,7 @@ import Profile from "./components/pages/Profile";
 import Register from "./components/pages/Register";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import Layout from "./layout/Layout";
+import Notes from "./components/pages/Notes";
 import { fetchWithTokenRefresh } from "./utils/utils";
 
 import "./App.css";
@@ -155,7 +156,7 @@ function App() {
             }
           />
 
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={isAuthenticated ? <Notes /> : <Home />} />
         </Routes>
       </Layout>
 
