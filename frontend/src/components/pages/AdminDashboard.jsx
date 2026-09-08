@@ -10,7 +10,9 @@ const AdminDashboard = () => {
             <div className="card-header">Users</div>
             <div className="card-body">
               <h5 className="card-title">Manage Users</h5>
-              <p className="card-text">Add, edit, or delete users from the system.</p>
+              <p className="card-text">
+                Add, edit, or delete users from the system.
+              </p>
             </div>
           </div>
         </div>
@@ -19,7 +21,9 @@ const AdminDashboard = () => {
             <div className="card-header">Companies</div>
             <div className="card-body">
               <h5 className="card-title">Manage Companies</h5>
-              <p className="card-text">Add, edit, or delete company information.</p>
+              <p className="card-text">
+                Add, edit, or delete company information.
+              </p>
             </div>
           </div>
         </div>

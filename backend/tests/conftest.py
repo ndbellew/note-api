@@ -62,10 +62,12 @@ def client(app):
 @pytest.fixture()
 def user(app):
     user = User(
+        username="testuser",
         email="test@example.com",
         role="user",
     )
-    user.set_password("correct-password")
+    password = user.hash_password("correct-password")
+    user.password_hash = password
 
     db.session.add(user)
     db.session.commit()

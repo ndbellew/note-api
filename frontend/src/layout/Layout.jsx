@@ -1,22 +1,19 @@
+import React from "react";
+import NavBar from "../components/navigations/NavBar";
+import Footer from "../components/navigations/Footer";
 
-import React from 'react'
-import NavBar from '../components/navigations/NavBar'
-import Footer from '../components/navigations/Footer'
-
-import './Layout.css'
+import "./Layout.css";
 
 const Layout = (props) => {
-  return(
+  return (
     <React.Fragment>
       <NavBar />
 
-      <main className="main-content">
-        {props.children}
-      </main>
+      <main className="main-content">{props.children}</main>
 
-      <Footer/>
+      <Footer />
     </React.Fragment>
   );
-}
+};
 
 export default Layout;

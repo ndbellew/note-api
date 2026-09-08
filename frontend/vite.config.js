@@ -17,9 +17,7 @@ export default defineConfig(({ mode }) => {
 
       proxy: {
         "/api": {
-          target:
-            env.API_PROXY_TARGET ??
-            "http://localhost:5000",
+          target: env.API_PROXY_TARGET ?? "http://localhost:5000",
           changeOrigin: true,
         },
       },
@@ -35,6 +33,27 @@ export default defineConfig(({ mode }) => {
       environment: "jsdom",
       globals: true,
       setupFiles: "./src/setupTests.js",
+
+      coverage: {
+        provider: "v8",
+        reporter: ["text", "html", "lcov"],
+
+        exclude: [
+          "src/main.jsx",
+          "src/index.jsx",
+          "src/reportWebVitals.jsx",
+          "src/setupTests.js",
+          "**/*.css",
+          "**/*.svg",
+        ],
+
+        thresholds: {
+          lines: 85,
+          functions: 85,
+          branches: 85,
+          statements: 85,
+        },
+      },
     },
   };
 });
