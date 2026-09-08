@@ -24,10 +24,9 @@ def create_app(config_class=Config) -> Flask:
         },
     )
 
-
+    from ..app.notes import notes_bp
     from ..app.routes import api_bp
     from ..app.user import user_bp
-    from ..notes.routes import notes_bp
 
     app.register_blueprint(api_bp)
     app.register_blueprint(user_bp)

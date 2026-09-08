@@ -16,6 +16,7 @@ class TestConfig(Config):
 @pytest.fixture()
 def other_user(app):
     user = User(
+        username="otheruser",
         email="other@example.com",
         role="user",
     )

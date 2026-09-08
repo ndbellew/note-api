@@ -105,6 +105,7 @@ def test_update_note_content(client, auth_headers, note):
         f"/notes/{note.id}",
         headers=auth_headers,
         json={
+            "title": note.title,
             "content": "Updated content",
         },
     )

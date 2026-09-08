@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from api.extensions import db
+from ..extensions import db
 
 
 class Note(db.Model):  # type: ignore[name-defined]
