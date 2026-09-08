@@ -71,9 +71,7 @@ describe("Notes", () => {
 
     render(<Notes />);
 
-    expect(
-      await screen.findByDisplayValue("First Note"),
-    ).toBeInTheDocument();
+    expect(await screen.findByDisplayValue("First Note")).toBeInTheDocument();
 
     expect(
       await screen.findByDisplayValue("First note content"),
@@ -94,9 +92,7 @@ describe("Notes", () => {
 
     fireEvent.click(secondNoteButton);
 
-    expect(
-      await screen.findByDisplayValue("Second Note"),
-    ).toBeInTheDocument();
+    expect(await screen.findByDisplayValue("Second Note")).toBeInTheDocument();
 
     expect(
       await screen.findByDisplayValue("Second note content"),
@@ -144,9 +140,7 @@ describe("Notes", () => {
       });
     });
 
-    expect(
-      await screen.findByDisplayValue("New Note"),
-    ).toBeInTheDocument();
+    expect(await screen.findByDisplayValue("New Note")).toBeInTheDocument();
   });
 
   test("updates a note", async () => {
@@ -200,9 +194,7 @@ describe("Notes", () => {
       });
     });
 
-    expect(
-      await screen.findByDisplayValue("Updated Note"),
-    ).toBeInTheDocument();
+    expect(await screen.findByDisplayValue("Updated Note")).toBeInTheDocument();
 
     expect(
       await screen.findByDisplayValue("Updated content"),
@@ -243,9 +235,7 @@ describe("Notes", () => {
       expect(screen.queryByText("First Note")).not.toBeInTheDocument();
     });
 
-    expect(
-      await screen.findByDisplayValue("Second Note"),
-    ).toBeInTheDocument();
+    expect(await screen.findByDisplayValue("Second Note")).toBeInTheDocument();
 
     expect(
       await screen.findByDisplayValue("Second note content"),
