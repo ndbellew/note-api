@@ -148,6 +148,7 @@ function Notes() {
 
         <div className="col-md-8">
           <NoteEditor
+            key={selectedNote?.id ?? "empty"}
             note={selectedNote}
             onSave={saveNote}
             onDelete={deleteNote}

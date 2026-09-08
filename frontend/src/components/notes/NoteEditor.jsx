@@ -1,18 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function NoteEditor({ note, onSave, onDelete }) {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-
-  useEffect(() => {
-    if (note) {
-      setTitle(note.title);
-      setContent(note.content);
-    } else {
-      setTitle("");
-      setContent("");
-    }
-  }, [note]);
+  const [title, setTitle] = useState(note?.title ?? "");
+  const [content, setContent] = useState(note?.content ?? "");
 
   if (!note) {
     return <div className="text-muted">Select a note to begin editing.</div>;
