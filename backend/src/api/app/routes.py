@@ -7,7 +7,7 @@ from flask_jwt_extended import (
 )
 from flask_wtf.csrf import generate_csrf
 
-api_bp = Blueprint("api", __name__)
+api_bp = Blueprint("api", __name__, url_prefix="/api")
 
 
 @api_bp.get("/")

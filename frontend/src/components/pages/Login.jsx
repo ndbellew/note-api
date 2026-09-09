@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../AuthContext";
 
 const Login = ({ csrfToken }) => {
+  const { setIsAuthenticated } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -10,7 +12,7 @@ const Login = ({ csrfToken }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch("/login", {
+    const response = await fetch("/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -23,11 +25,14 @@ const Login = ({ csrfToken }) => {
       if (response.ok) {
         localStorage.setItem("token", data.access_token);
         localStorage.setItem("refresh_token", data.refresh_token);
+
         alert("Login successful!");
         if (data.role === "admin") {
+          setIsAuthenticated(true);
           navigate("/admin/dashboard");
         } else {
-          navigate("/");
+          setIsAuthenticated(true);
+          navigate("/notes/");
         }
       } else {
         setError(data.error || "Login failed!");

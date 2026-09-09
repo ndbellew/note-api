@@ -1,12 +1,15 @@
 import { Navigate } from "react-router-dom";
-
-const ProtectedRoute = ({
-  element: Component,
+console.log("ProtectedRoutes LOADED");
+const ProtectedRoutes = ({
   isAuthenticated,
   isAdmin,
   requireAdmin = false,
+  csrfToken,
   ...rest
 }) => {
+  console.log("ProtectedRoute rest:", rest);
+  console.log("ProtectedRoute CSRF Token:", rest.csrfToken);
+  console.log("ProtectedRoute CSRFToken:", csrfToken);
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
@@ -15,7 +18,12 @@ const ProtectedRoute = ({
     return <Navigate to="/unauthorized" />;
   }
 
-  return <Component {...rest} />;
+  return (
+    <div>
+      PROTECTED ROUTE HIT
+      <pre>{JSON.stringify(rest, null, 2)}</pre>
+    </div>
+  );
 };
 
-export default ProtectedRoute;
+export default ProtectedRoutes;

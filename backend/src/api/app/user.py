@@ -6,19 +6,20 @@ from flask_jwt_extended import (
     get_jwt_identity,
     jwt_required,
 )
+from sqlalchemy.exc import IntegrityError
 
 from ..decorators.require_json import require_json
 from ..extensions import csrf, db
 from ..models import RevokedToken, User
 
-user_bp = Blueprint("user", __name__)
+user_bp = Blueprint("user", __name__, url_prefix="/api")
 
 
 @csrf.exempt
 @user_bp.post("/auth/me")
 @jwt_required()
 def validate_token():
-    identity = get_jwt_identity()
+    identity = int(get_jwt_identity())
     claims = get_jwt()
     user = db.session.execute(
         db.select(User).where(User.id == identity)
@@ -68,13 +69,29 @@ def get_profile(username: str):
         created_at=user.created_at.isoformat(),
     ), 200
 
-
+@csrf.exempt
 @user_bp.post("/register")
 @require_json("username", "email", "password")
 def register(data: dict):
     username = str(data["username"]).strip().lower()
     email = str(data["email"]).strip().lower()
     password = data["password"]
+
+    existing_user = db.session.execute(
+        db.select(User).where(
+            db.or_(
+                User.username == username,
+                User.email == email,
+            )
+        )
+    ).scalar_one_or_none()
+
+    if existing_user:
+        if existing_user.email == email:
+            return jsonify(error="Email is already registered"), 409
+        if existing_user.username == username:
+            return jsonify(error="Username is already registered"), 409
+
 
     user = User().set_register_data(
         username=username,
@@ -83,7 +100,11 @@ def register(data: dict):
     )
 
     db.session.add(user)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify(error="Username or email already exists"), 409
 
     return jsonify(
         message="Registration successful",

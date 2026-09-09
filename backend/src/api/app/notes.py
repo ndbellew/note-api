@@ -49,6 +49,10 @@ def create_note(data: dict[str, str]):
         content=content,
         user_id=user_id,
     )
+    count = Note.count_for_user(user_id)
+
+    if title == "New Note":
+        note.title = f"Untitled Note {count}"
 
     db.session.add(note)
     db.session.commit()
@@ -136,7 +140,9 @@ def update_note(data: dict, note_id: int):
         return jsonify({"error": "Title must be 255 characters or fewer"}), 400
     elif len(title) == 0:
         return jsonify({"error": "Title cannot be empty"}), 400
-
+    count = Note.count_for_user(user_id)
+    if title == "New Note":
+        title = f"Untitled Note {count}"
     note.title = title
 
     if "content" in data:

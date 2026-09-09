@@ -25,7 +25,7 @@ function App() {
 
   useEffect(() => {
     const fetchCsrfToken = async () => {
-      const response = await fetchWithTokenRefresh("/get-csrf-token", {
+      const response = await fetchWithTokenRefresh("/api/get-csrf-token", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -33,6 +33,7 @@ function App() {
 
       if (response?.ok) {
         const data = await response.json();
+        console.log("CSRF Token:", data.csrf_token);
         setCsrfToken(data.csrf_token);
       } else {
         console.error("Failed to fetch CSRF token");
@@ -48,7 +49,7 @@ function App() {
       }
 
       try {
-        const response = await fetchWithTokenRefresh("/auth/me", {
+        const response = await fetchWithTokenRefresh("/api/auth/me", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -103,7 +104,7 @@ function App() {
   if (isAuthLoading) {
     return <p>Loading...</p>;
   }
-
+  console.log("CSRF Token: pre-return", csrfToken);
   return (
     <div className="container">
       <Layout>
@@ -122,17 +123,6 @@ function App() {
               )
             }
           />
-
-          <Route
-            path="/Profile/:username"
-            element={
-              <ProtectedRoutes
-                isAuthenticated={isAuthenticated}
-                element={Profile}
-              />
-            }
-          />
-
           <Route
             path="/Register"
             element={
@@ -141,6 +131,27 @@ function App() {
               ) : (
                 <Register csrfToken={csrfToken} />
               )
+            }
+          />
+
+          <Route
+            path="/Notes"
+            element={
+              <ProtectedRoutes
+                element={Notes}
+                isAuthenticated={isAuthenticated}
+                csrfToken={csrfToken}
+              />
+            }
+          />
+
+          <Route
+            path="/Profile/:username"
+            element={
+              <ProtectedRoutes
+                isAuthenticated={isAuthenticated}
+                element={Profile}
+              />
             }
           />
 
@@ -156,7 +167,16 @@ function App() {
             }
           />
 
-          <Route path="/" element={isAuthenticated ? <Notes /> : <Home />} />
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                  <Notes csrfToken={csrfToken} />
+              ) : (
+                  <Home />
+              )
+            }
+          />
         </Routes>
       </Layout>
 

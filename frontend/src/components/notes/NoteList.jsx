@@ -5,14 +5,21 @@ function NoteList({ notes, selectedNote, onSelectNote }) {
     <div>
       <h2>Notes</h2>
 
-      {notes.map((note) => (
-        <NoteListItem
-          key={note.id}
-          note={note}
-          isSelected={selectedNote?.id === note.id}
-          onClick={() => onSelectNote(note)}
-        />
-      ))}
+      <div
+        style={{
+          maxHeight: "70vh",
+          overflowY: "auto",
+        }}
+      >
+        {notes.map((note) => (
+          <NoteListItem
+            key={note.id}
+            note={note}
+            isSelected={selectedNote?.id === note.id}
+            onClick={() => onSelectNote(note)}
+          />
+        ))}
+      </div>
     </div>
   );
 }

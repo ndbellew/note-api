@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     const validateToken = async () => {
       const token = localStorage.getItem("token");
       if (token) {
-        const response = await fetchWithTokenRefresh("/auth/me", {
+        const response = await fetchWithTokenRefresh("/api/auth/me", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         isAuthenticated,
+        setIsAuthenticated,
         isAdmin,
         username,
       }}

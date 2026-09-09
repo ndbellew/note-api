@@ -53,11 +53,19 @@ const NavBar = () => {
               </>
             )}
             {isAuthenticated && (
-              <li className="nav-item">
-                <Link className="nav-link" to={`/Profile/${username}`}>
-                  Profile
-                </Link>
-              </li>
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/Notes">
+                    Notes
+                  </Link>
+                </li>
+
+                <li className="nav-item">
+                  <Link className="nav-link" to={`/Profile/${username}`}>
+                    Profile
+                  </Link>
+                </li>
+              </>
             )}
             {isAuthenticated && isAdmin && (
               <li className="nav-item">

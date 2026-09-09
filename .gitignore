@@ -189,3 +189,4 @@ backend/logs/
 # Super Secrett Configs
 api/config.py
 /backend/test.txt
+/frontend/test.txt

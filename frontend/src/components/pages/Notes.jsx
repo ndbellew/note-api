@@ -4,15 +4,16 @@ import NoteEditor from "../notes/NoteEditor";
 import NoteList from "../notes/NoteList";
 import { fetchWithTokenRefresh } from "../../utils/utils";
 
-function Notes() {
+function Notes({ csrfToken }) {
   const [notes, setNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-
+  console.log("Inside Notes, CSRFToken: ", csrfToken, "");
   const authHeaders = () => ({
     "Content-Type": "application/json",
     Authorization: `Bearer ${localStorage.getItem("token")}`,
+    "X-CSRFToken": csrfToken,
   });
 
   useEffect(() => {
@@ -44,8 +45,9 @@ function Notes() {
     void fetchNotes();
   }, []);
 
-  const createNote = async () => {
+  const startNewNote = async () => {
     try {
+      console.log("CSRF being sent: ", csrfToken);
       const response = await fetchWithTokenRefresh("/notes/", {
         method: "POST",
         headers: authHeaders(),
@@ -62,7 +64,6 @@ function Notes() {
       const newNote = await response.json();
 
       setNotes((currentNotes) => [newNote, ...currentNotes]);
-
       setSelectedNote(newNote);
     } catch (error) {
       console.error(error);
@@ -70,35 +71,38 @@ function Notes() {
     }
   };
 
-  const saveNote = async (note) => {
-    try {
-      const response = await fetchWithTokenRefresh(`/notes/${note.id}`, {
+  const saveNote = async ({ title, content }) => {
+  try {
+    const response = await fetchWithTokenRefresh(
+      `/notes/${selectedNote.id}`,
+      {
         method: "PATCH",
         headers: authHeaders(),
         body: JSON.stringify({
-          title: note.title,
-          content: note.content,
+          title,
+          content,
         }),
-      });
+      },
+    );
 
-      if (!response?.ok) {
-        throw new Error("Failed to update note");
-      }
-
-      const updatedNote = await response.json();
-
-      setNotes((currentNotes) =>
-        currentNotes.map((currentNote) =>
-          currentNote.id === updatedNote.id ? updatedNote : currentNote,
-        ),
-      );
-
-      setSelectedNote(updatedNote);
-    } catch (error) {
-      console.error(error);
-      setError("Unable to save note.");
+    if (!response?.ok) {
+      throw new Error("Failed to update note");
     }
-  };
+
+    const updatedNote = await response.json();
+
+    setNotes((currentNotes) =>
+      currentNotes.map((note) =>
+        note.id === updatedNote.id ? updatedNote : note,
+      ),
+    );
+
+    setSelectedNote(updatedNote);
+  } catch (error) {
+    console.error(error);
+    setError("Unable to save note.");
+  }
+};
 
   const deleteNote = async (noteId) => {
     try {
@@ -130,7 +134,7 @@ function Notes() {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1>My Notes</h1>
 
-        <button className="btn btn-primary" onClick={createNote}>
+        <button className="btn btn-primary" onClick={startNewNote}>
           + New Note
         </button>
       </div>

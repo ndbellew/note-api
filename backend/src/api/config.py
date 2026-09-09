@@ -32,4 +32,4 @@ class Config:
     )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    WTF_CSRF_TIME_LIMIT = timedelta(hours=1)
+    WTF_CSRF_TIME_LIMIT = 3600
