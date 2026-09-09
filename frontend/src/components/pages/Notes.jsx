@@ -72,37 +72,37 @@ function Notes({ csrfToken }) {
   };
 
   const saveNote = async ({ title, content }) => {
-  try {
-    const response = await fetchWithTokenRefresh(
-      `/notes/${selectedNote.id}`,
-      {
-        method: "PATCH",
-        headers: authHeaders(),
-        body: JSON.stringify({
-          title,
-          content,
-        }),
-      },
-    );
+    try {
+      const response = await fetchWithTokenRefresh(
+        `/notes/${selectedNote.id}`,
+        {
+          method: "PATCH",
+          headers: authHeaders(),
+          body: JSON.stringify({
+            title,
+            content,
+          }),
+        },
+      );
 
-    if (!response?.ok) {
-      throw new Error("Failed to update note");
+      if (!response?.ok) {
+        throw new Error("Failed to update note");
+      }
+
+      const updatedNote = await response.json();
+
+      setNotes((currentNotes) =>
+        currentNotes.map((note) =>
+          note.id === updatedNote.id ? updatedNote : note,
+        ),
+      );
+
+      setSelectedNote(updatedNote);
+    } catch (error) {
+      console.error(error);
+      setError("Unable to save note.");
     }
-
-    const updatedNote = await response.json();
-
-    setNotes((currentNotes) =>
-      currentNotes.map((note) =>
-        note.id === updatedNote.id ? updatedNote : note,
-      ),
-    );
-
-    setSelectedNote(updatedNote);
-  } catch (error) {
-    console.error(error);
-    setError("Unable to save note.");
-  }
-};
+  };
 
   const deleteNote = async (noteId) => {
     try {

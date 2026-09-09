@@ -1,6 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "./AuthContext";
 
 import AboutUs from "./components/pages/AboutUs";
 import AdminDashboard from "./components/pages/AdminDashboard";
@@ -17,11 +18,10 @@ import { fetchWithTokenRefresh } from "./utils/utils";
 import "./App.css";
 
 function App() {
-  const [currentTime, setCurrentTime] = useState("Time since Epoch!");
   const [csrfToken, setCsrfToken] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const { isAuthenticated, setIsAuthenticated, isAdmin, setIsAdmin } =
+    useContext(AuthContext);
 
   useEffect(() => {
     const fetchCsrfToken = async () => {
@@ -84,22 +84,6 @@ function App() {
     void fetchCsrfToken();
     void validateAuth();
   }, []);
-
-  const fetchTime = async () => {
-    const response = await fetch("/time", {
-      headers: {
-        "X-CSRFToken": csrfToken,
-      },
-    });
-
-    if (!response.ok) {
-      console.error("Failed to fetch server time");
-      return;
-    }
-
-    const data = await response.json();
-    setCurrentTime(data.time);
-  };
 
   if (isAuthLoading) {
     return <p>Loading...</p>;
@@ -170,25 +154,11 @@ function App() {
           <Route
             path="/"
             element={
-              isAuthenticated ? (
-                  <Notes csrfToken={csrfToken} />
-              ) : (
-                  <Home />
-              )
+              isAuthenticated ? <Notes csrfToken={csrfToken} /> : <Home />
             }
           />
         </Routes>
       </Layout>
-
-      <div className="text-center mt-4">
-        <button
-          className="btn btn-primary"
-          onClick={fetchTime}
-          disabled={!csrfToken}
-        >
-          {currentTime}
-        </button>
-      </div>
     </div>
   );
 }

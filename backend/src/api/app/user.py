@@ -114,16 +114,15 @@ def register(data: dict):
 
 
 @user_bp.post("/logout")
-@require_json("jti")
 @jwt_required()
-def logout(data: dict[str, str]):
-    jti: str = data.get("jti")
+def logout():
+    jti = get_jwt()["jti"]
 
     revoked_token = RevokedToken(jti=jti)
     db.session.add(revoked_token)
     db.session.commit()
 
-    return jsonify(message="Logged out")
+    return jsonify(message="Logged out"), 200
 
 
 @user_bp.post("/login")

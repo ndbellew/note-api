@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 function NoteEditor({ note, onSave, onDelete }) {
   const [title, setTitle] = useState(note?.title ?? "");
@@ -29,14 +30,30 @@ function NoteEditor({ note, onSave, onDelete }) {
         required
       />
 
-      <textarea
-        className="form-control mb-3"
-        rows="15"
-        value={content}
-        onChange={(event) => setContent(event.target.value)}
-      />
+      <div className="row g-3">
+        <div className="col-md-8">
+          <textarea
+            className="form-control"
+            rows="15"
+            value={content}
+            onChange={(event) => setContent(event.target.value)}
+          />
+        </div>
 
-      <div className="d-flex justify-content-between">
+        <div className="col-md-4">
+          <div
+            className="border rounded p-3"
+            style={{
+              height: "350px",
+              overflowY: "auto",
+            }}
+          >
+            <ReactMarkdown>{content}</ReactMarkdown>
+          </div>
+        </div>
+      </div>
+
+      <div className="d-flex justify-content-between mt-3">
         <button
           type="button"
           className="btn btn-danger"

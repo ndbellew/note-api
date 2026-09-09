@@ -45,6 +45,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         setIsAuthenticated,
         isAdmin,
+        setIsAdmin,
         username,
       }}
     >

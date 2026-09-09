@@ -32,7 +32,7 @@ const Login = ({ csrfToken }) => {
           navigate("/admin/dashboard");
         } else {
           setIsAuthenticated(true);
-          navigate("/notes/");
+          navigate("/Notes");
         }
       } else {
         setError(data.error || "Login failed!");
