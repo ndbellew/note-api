@@ -93,7 +93,7 @@ describe("Register", () => {
     fireEvent.click(screen.getByRole("button", { name: "Register" }));
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith("/register", {
+      expect(fetch).toHaveBeenCalledWith("/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

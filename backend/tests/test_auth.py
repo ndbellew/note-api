@@ -1,9 +1,11 @@
 from api.models import User
 
+LOGIN_URL = "/api/login"
+
 
 def test_login_returns_tokens(client, user):
     response = client.post(
-        "/login",
+        LOGIN_URL,
         json={
             "username": user.username,
             "email": user.email,
@@ -21,9 +23,9 @@ def test_login_returns_tokens(client, user):
 
 def test_login_rejects_incorrect_password(client, user):
     response = client.post(
-        "/login",
+        LOGIN_URL,
         json={
-            "username": "test-username",
+            "username": user.username,
             "email": user.email,
             "password": "wrong-password",
         },
@@ -37,7 +39,7 @@ def test_login_rejects_incorrect_password(client, user):
 
 def test_login_rejects_unknown_email(client):
     response = client.post(
-        "/login",
+        LOGIN_URL,
         json={
             "username": "test-username",
             "email": "missing@example.com",
@@ -53,7 +55,7 @@ def test_login_rejects_unknown_email(client):
 
 def test_login_requires_email(client):
     response = client.post(
-        "/login",
+        LOGIN_URL,
         json={
             "username": "test-username",
             "password": "correct-password",
@@ -65,7 +67,7 @@ def test_login_requires_email(client):
 
 def test_login_requires_password(client):
     response = client.post(
-        "/login",
+        LOGIN_URL,
         json={
             "username": "test-username",
             "email": "test@example.com",
@@ -77,29 +79,30 @@ def test_login_requires_password(client):
 
 def test_login_requires_username(client):
     response = client.post(
-        "/login",
+        LOGIN_URL,
         json={
             "email": "test@example.com",
             "password": "correct-password",
         },
     )
+
     assert response.status_code == 401
 
 
 def test_login_rejects_missing_json_body(client):
-    response = client.post("/login")
+    response = client.post(LOGIN_URL)
 
     assert response.status_code == 400
 
 
-def test_password_is_stored_as_hash(app):
+def test_password_is_stored_as_hash():
     user = User(
         username="hasheduser",
         email="hashed@example.com",
         role="user",
     )
-    password = user.hash_password("super-secret-password")
-    user.password_hash = password
+
+    user.password_hash = user.hash_password("super-secret-password")
 
     assert user.password_hash != "super-secret-password"
     assert user.check_password("super-secret-password")

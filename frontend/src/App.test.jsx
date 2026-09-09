@@ -1,5 +1,6 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import App from "./App.jsx";
@@ -10,34 +11,54 @@ vi.mock("./utils/utils", () => ({
   fetchWithTokenRefresh: vi.fn(),
 }));
 
+const TestAuthProvider = ({
+  children,
+  initialAuthenticated = false,
+  initialAdmin = false,
+  username = "",
+}) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(initialAuthenticated);
+  const [isAdmin, setIsAdmin] = useState(initialAdmin);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        setIsAuthenticated,
+        isAdmin,
+        setIsAdmin,
+        username,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
 describe("App", () => {
   beforeEach(() => {
     localStorage.clear();
-
-    vi.stubGlobal("fetch", vi.fn());
-
     fetchWithTokenRefresh.mockReset();
   });
 
   afterEach(() => {
     localStorage.clear();
     vi.restoreAllMocks();
-    vi.unstubAllGlobals();
   });
 
   const renderApp = (
     initialRoute = "/",
-    authValue = {
-      isAuthenticated: false,
-      isAdmin: false,
-      username: "",
-    },
+    { isAuthenticated = false, isAdmin = false, username = "" } = {},
   ) => {
     render(
       <MemoryRouter initialEntries={[initialRoute]}>
-        <AuthContext.Provider value={authValue}>
+        <TestAuthProvider
+          initialAuthenticated={isAuthenticated}
+          initialAdmin={isAdmin}
+          username={username}
+        >
           <App />
-        </AuthContext.Provider>
+        </TestAuthProvider>
       </MemoryRouter>,
     );
   };
@@ -52,7 +73,7 @@ describe("App", () => {
 
     renderApp();
 
-    expect(screen.getByRole("navigation")).toBeInTheDocument();
+    expect(await screen.findByRole("navigation")).toBeInTheDocument();
   });
 
   test("fetches CSRF token on mount", async () => {
@@ -66,11 +87,14 @@ describe("App", () => {
     renderApp();
 
     await waitFor(() => {
-      expect(fetchWithTokenRefresh).toHaveBeenCalledWith("/get-csrf-token", {
-        headers: {
-          Authorization: "Bearer null",
+      expect(fetchWithTokenRefresh).toHaveBeenCalledWith(
+        "/api/get-csrf-token",
+        {
+          headers: {
+            Authorization: "Bearer null",
+          },
         },
-      });
+      );
     });
   });
 
@@ -109,7 +133,7 @@ describe("App", () => {
     renderApp("/Login");
 
     await waitFor(() => {
-      expect(fetchWithTokenRefresh).toHaveBeenCalledWith("/auth/me", {
+      expect(fetchWithTokenRefresh).toHaveBeenCalledWith("/api/auth/me", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -171,77 +195,6 @@ describe("App", () => {
         "Token validation failed:",
         expect.any(Error),
       );
-    });
-  });
-
-  test("fetches and displays server time", async () => {
-    fetchWithTokenRefresh.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue({
-        csrf_token: "csrf-token",
-      }),
-    });
-
-    fetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue({
-        time: "2026-09-08T09:45:00",
-      }),
-    });
-
-    renderApp();
-
-    const button = screen.getByRole("button", {
-      name: "Time since Epoch!",
-    });
-
-    await waitFor(() => {
-      expect(button).toBeEnabled();
-    });
-
-    fireEvent.click(button);
-
-    expect(
-      await screen.findByRole("button", {
-        name: "2026-09-08T09:45:00",
-      }),
-    ).toBeInTheDocument();
-
-    expect(fetch).toHaveBeenCalledWith("/time", {
-      headers: {
-        "X-CSRFToken": "csrf-token",
-      },
-    });
-  });
-
-  test("logs error when server time fetch fails", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-
-    fetchWithTokenRefresh.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue({
-        csrf_token: "csrf-token",
-      }),
-    });
-
-    fetch.mockResolvedValue({
-      ok: false,
-    });
-
-    renderApp();
-
-    const button = screen.getByRole("button", {
-      name: "Time since Epoch!",
-    });
-
-    await waitFor(() => {
-      expect(button).toBeEnabled();
-    });
-
-    fireEvent.click(button);
-
-    await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith("Failed to fetch server time");
     });
   });
 

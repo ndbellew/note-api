@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-
+import { AuthContext } from "../../AuthContext";
 import Login from "./Login";
 
 describe("Login", () => {
@@ -19,13 +19,19 @@ describe("Login", () => {
 
   const renderLogin = () => {
     render(
-      <MemoryRouter initialEntries={["/Login"]}>
-        <Routes>
-          <Route path="/Login" element={<Login csrfToken="csrf-token" />} />
-          <Route path="/" element={<div>Home Page</div>} />
-          <Route path="/admin/dashboard" element={<div>Admin Page</div>} />
-        </Routes>
-      </MemoryRouter>,
+      <AuthContext.Provider
+        value={{
+          setIsAuthenticated: vi.fn(),
+        }}
+      >
+        <MemoryRouter initialEntries={["/Login"]}>
+          <Routes>
+            <Route path="/Login" element={<Login csrfToken="csrf-token" />} />
+            <Route path="/Notes" element={<div>Notes Page</div>} />
+            <Route path="/admin/dashboard" element={<div>Admin Page</div>} />
+          </Routes>
+        </MemoryRouter>
+      </AuthContext.Provider>,
     );
   };
 
@@ -54,12 +60,12 @@ describe("Login", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Submit" }));
 
-    expect(await screen.findByText("Home Page")).toBeInTheDocument();
+    expect(await screen.findByText("Notes Page")).toBeInTheDocument();
 
     expect(localStorage.getItem("token")).toBe("access-token");
     expect(localStorage.getItem("refresh_token")).toBe("refresh-token");
 
-    expect(fetch).toHaveBeenCalledWith("/login", {
+    expect(fetch).toHaveBeenCalledWith("/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

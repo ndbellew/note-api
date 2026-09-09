@@ -33,7 +33,7 @@ class Note(db.Model):  # type: ignore[name-defined]
     @classmethod
     def count_for_user(cls, user_id: int) -> int:
         return len(
-            db.session.execute(
-                db.select(cls).where(cls.user_id == user_id)
-            ).scalars().all()
+            db.session.execute(db.select(cls).where(cls.user_id == user_id))
+            .scalars()
+            .all()
         )

@@ -4,84 +4,67 @@ import { describe, expect, test } from "vitest";
 
 import ProtectedRoutes from "./ProtectedRoutes";
 
-const TestPage = () => <div>Protected Content</div>;
+const ProtectedContent = () => <div>Protected Content</div>;
+
+const renderProtectedRoute = ({
+  isAuthenticated = false,
+  isAdmin = false,
+  requireAdmin = false,
+} = {}) => {
+  render(
+    <MemoryRouter initialEntries={["/protected"]}>
+      <Routes>
+        <Route
+          path="/protected"
+          element={
+            <ProtectedRoutes
+              element={ProtectedContent}
+              isAuthenticated={isAuthenticated}
+              isAdmin={isAdmin}
+              requireAdmin={requireAdmin}
+            />
+          }
+        />
+
+        <Route path="/login" element={<div>Login Page</div>} />
+        <Route path="/unauthorized" element={<div>Unauthorized</div>} />
+      </Routes>
+    </MemoryRouter>,
+  );
+};
 
 describe("ProtectedRoutes", () => {
-  test("redirects unauthenticated user to login", () => {
-    render(
-      <MemoryRouter initialEntries={["/protected"]}>
-        <Routes>
-          <Route
-            path="/protected"
-            element={
-              <ProtectedRoutes isAuthenticated={false} element={TestPage} />
-            }
-          />
-          <Route path="/login" element={<div>Login Page</div>} />
-        </Routes>
-      </MemoryRouter>,
-    );
+  test("redirects unauthenticated user to login", async () => {
+    renderProtectedRoute();
 
-    expect(screen.getByText("Login Page")).toBeInTheDocument();
+    expect(await screen.findByText("Login Page")).toBeInTheDocument();
   });
 
-  test("renders protected component for authenticated user", () => {
-    render(
-      <MemoryRouter initialEntries={["/protected"]}>
-        <Routes>
-          <Route
-            path="/protected"
-            element={<ProtectedRoutes isAuthenticated element={TestPage} />}
-          />
-        </Routes>
-      </MemoryRouter>,
-    );
+  test("renders protected component for authenticated user", async () => {
+    renderProtectedRoute({
+      isAuthenticated: true,
+    });
 
-    expect(screen.getByText("Protected Content")).toBeInTheDocument();
+    expect(await screen.findByText("Protected Content")).toBeInTheDocument();
   });
 
-  test("redirects non-admin from admin route", () => {
-    render(
-      <MemoryRouter initialEntries={["/admin"]}>
-        <Routes>
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoutes
-                isAuthenticated
-                isAdmin={false}
-                requireAdmin
-                element={TestPage}
-              />
-            }
-          />
-          <Route path="/unauthorized" element={<div>Unauthorized</div>} />
-        </Routes>
-      </MemoryRouter>,
-    );
+  test("redirects non-admin from admin route", async () => {
+    renderProtectedRoute({
+      isAuthenticated: true,
+      isAdmin: false,
+      requireAdmin: true,
+    });
 
-    expect(screen.getByText("Unauthorized")).toBeInTheDocument();
+    expect(await screen.findByText("Unauthorized")).toBeInTheDocument();
   });
 
-  test("allows admin through admin route", () => {
-    render(
-      <MemoryRouter initialEntries={["/admin"]}>
-        <Routes>
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoutes
-                isAuthenticated
-                isAdmin
-                requireAdmin
-                element={TestPage}
-              />
-            }
-          />
-        </Routes>
-      </MemoryRouter>,
-    );
+  test("allows admin through admin route", async () => {
+    renderProtectedRoute({
+      isAuthenticated: true,
+      isAdmin: true,
+      requireAdmin: true,
+    });
 
-    expect(screen.getByText("Protected Content")).toBeInTheDocument();
+    expect(await screen.findByText("Protected Content")).toBeInTheDocument();
   });
 });

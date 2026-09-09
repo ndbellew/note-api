@@ -1,5 +1,5 @@
 def test_index_returns_success(client):
-    response = client.get("/")
+    response = client.get("/api/health")
 
     assert response.status_code == 200
 

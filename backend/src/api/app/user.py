@@ -69,6 +69,7 @@ def get_profile(username: str):
         created_at=user.created_at.isoformat(),
     ), 200
 
+
 @csrf.exempt
 @user_bp.post("/register")
 @require_json("username", "email", "password")
@@ -91,7 +92,6 @@ def register(data: dict):
             return jsonify(error="Email is already registered"), 409
         if existing_user.username == username:
             return jsonify(error="Username is already registered"), 409
-
 
     user = User().set_register_data(
         username=username,

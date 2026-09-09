@@ -79,12 +79,15 @@ def user(app):
 @pytest.fixture()
 def login(client, user):
     response = client.post(
-        "/login",
+        "/api/login",
         json={
+            "username": user.username,
             "email": user.email,
             "password": "correct-password",
         },
     )
+
+    assert response.status_code == 200
 
     return response.get_json()
 

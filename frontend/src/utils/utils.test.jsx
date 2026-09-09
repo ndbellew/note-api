@@ -64,11 +64,11 @@ describe("fetchWithTokenRefresh", () => {
       },
     };
 
-    const result = await fetchWithTokenRefresh("/profile", options);
+    const result = await fetchWithTokenRefresh("/api/profile", options);
 
     expect(localStorage.getItem("token")).toBe("new-access-token");
 
-    expect(fetch).toHaveBeenNthCalledWith(2, "/refresh", {
+    expect(fetch).toHaveBeenNthCalledWith(2, "/api/refresh", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -76,7 +76,7 @@ describe("fetchWithTokenRefresh", () => {
       },
     });
 
-    expect(fetch).toHaveBeenNthCalledWith(3, "/profile", {
+    expect(fetch).toHaveBeenNthCalledWith(3, "/api/profile", {
       headers: {
         Authorization: "Bearer new-access-token",
       },
@@ -101,7 +101,7 @@ describe("fetchWithTokenRefresh", () => {
         status: 401,
       });
 
-    await fetchWithTokenRefresh("/profile", {
+    await fetchWithTokenRefresh("/api/profile", {
       headers: {
         Authorization: "Bearer expired-token",
       },
